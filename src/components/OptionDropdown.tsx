@@ -12,19 +12,21 @@ interface OptionDropdownProps {
   options: ApiOption[];
   selected: string;
   onChange: (value: string) => void;
+  label?: string;
 }
 
 export default function OptionDropdown({
   options,
   selected,
   onChange,
+  label = "Option",
 }: OptionDropdownProps) {
   const selectedOption = options.find((o) => o.id === selected);
 
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Option
+        {label}
       </label>
       <Listbox value={selected} onChange={onChange}>
         <div className="relative">

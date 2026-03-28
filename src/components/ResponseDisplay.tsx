@@ -1,7 +1,7 @@
-import { StrategistResponse } from "@/types";
+import { QueryResponse } from "@/types";
 
 interface ResponseDisplayProps {
-  response: StrategistResponse | null;
+  response: QueryResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -37,8 +37,24 @@ export default function ResponseDisplay({
     <div className="mt-8 rounded-lg bg-gray-50 p-6 border border-gray-200">
       <h2 className="text-lg font-semibold text-gray-900 mb-3">Response</h2>
       <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-        {response.content}
+        {response.answer}
       </div>
+      {response.sources && response.sources.length > 0 && (
+        <div className="mt-4 border-t border-gray-200 pt-4">
+          <h3 className="text-sm font-medium text-gray-900 mb-2">Sources</h3>
+          <ul className="space-y-2">
+            {response.sources.map((source, i) => (
+              <li key={i} className="text-xs text-gray-600 rounded bg-white p-3 border border-gray-100">
+                <span className="font-medium text-gray-700">{source.document}</span>
+                {source.score != null && (
+                  <span className="ml-2 text-gray-400">score: {source.score.toFixed(3)}</span>
+                )}
+                <p className="mt-1 whitespace-pre-wrap">{source.chunk}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

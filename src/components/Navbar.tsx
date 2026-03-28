@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NavLink from "./NavLink";
+import NavAuth from "./NavAuth";
 
 export default function Navbar() {
   return (
@@ -8,10 +9,11 @@ export default function Navbar() {
         <img src="/logo.svg" alt="Strategist" className="h-8 w-8" />
         <span className="font-semibold text-lg text-gray-900">Strategist</span>
       </Link>
-      <div className="flex gap-6">
+      <div className="flex items-center gap-6">
         <NavLink href="/">Home</NavLink>
         <NavLink href="/strategist">Strategist</NavLink>
         <NavLink href="/about">About</NavLink>
+        <NavAuth />
       </div>
     </nav>
   );

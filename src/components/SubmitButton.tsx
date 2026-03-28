@@ -2,9 +2,11 @@ interface SubmitButtonProps {
   onClick: () => void;
   loading: boolean;
   disabled?: boolean;
+  label?: string;
+  loadingLabel?: string;
 }
 
-export default function SubmitButton({ onClick, loading, disabled }: SubmitButtonProps) {
+export default function SubmitButton({ onClick, loading, disabled, label = "Submit", loadingLabel = "Submitting..." }: SubmitButtonProps) {
   return (
     <button
       type="button"
@@ -33,10 +35,10 @@ export default function SubmitButton({ onClick, loading, disabled }: SubmitButto
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          Submitting...
+          {loadingLabel}
         </>
       ) : (
-        "Submit"
+        label
       )}
     </button>
   );

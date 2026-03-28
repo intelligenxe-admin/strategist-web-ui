@@ -1,54 +1,138 @@
-import { StrategistResponse, ApiOption } from "@/types";
+import { AuthUser, UploadResponse, QueryResponse, StatsResponse } from "@/types";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-
-export async function fetchOptions(): Promise<ApiOption[]> {
-  const res = await fetch(`${API_BASE_URL}/options`);
-  if (!res.ok) throw new Error("Failed to fetch options");
-  return res.json();
-}
-
-export async function submitStrategistRequest(
-  file: File | null,
-  prompt: string,
-  option: string,
-  parameterValue: string
-): Promise<StrategistResponse> {
-  const formData = new FormData();
-  if (file) formData.append("file", file);
-  formData.append("prompt", prompt);
-  formData.append("option", option);
-  formData.append("parameter_value", parameterValue);
-
-  const res = await fetch(`${API_BASE_URL}/strategist`, {
-    method: "POST",
-    body: formData,
+async function authFetch(url: string, options: RequestInit, token: string): Promise<Response> {
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Token ${token}`,
+    },
   });
-  if (!res.ok) throw new Error("Request failed");
-  return res.json();
-}
 
-export async function submitAnalyzeRequest(
-  file: File
-): Promise<StrategistResponse> {
-  const formData = new FormData();
-  formData.append("document", file, file.name);
-
-  const res = await fetch("/api/analyze", {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Analysis request failed");
-
-  const contentType = res.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    const json = await res.json();
-    const content =
-      json.content ?? json.result ?? json.data ?? JSON.stringify(json, null, 2);
-    return { content };
+  if (res.status === 401) {
+    localStorage.removeItem("auth");
+    window.location.href = "/login";
+    throw new Error("Session expired");
   }
 
-  const text = await res.text();
-  return { content: text };
+  return res;
+}
+
+// Auth (no token needed)
+
+export async function loginUser(username: string, password: string): Promise<AuthUser> {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.non_field_errors?.[0] || data?.error || "Login failed");
+  }
+
+  return res.json();
+}
+
+export async function registerUser(
+  username: string,
+  password: string,
+  email: string
+): Promise<AuthUser> {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password, email }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    const msg =
+      data?.username?.[0] || data?.email?.[0] || data?.password?.[0] || data?.error || "Registration failed";
+    throw new Error(msg);
+  }
+
+  return res.json();
+}
+
+// RAG operations (all require token)
+
+export async function uploadDocument(
+  file: File,
+  extractionMethod: string,
+  token: string
+): Promise<UploadResponse> {
+  const formData = new FormData();
+  formData.append("document", file, file.name);
+  formData.append("extraction_method", extractionMethod);
+
+  const res = await authFetch("/api/rag/upload", { method: "POST", body: formData }, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Upload failed");
+  }
+
+  return res.json();
+}
+
+export async function queryKnowledgeBase(
+  question: string,
+  topK: number,
+  token: string
+): Promise<QueryResponse> {
+  const res = await authFetch(
+    "/api/rag/query",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, top_k: topK }),
+    },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Query failed");
+  }
+
+  return res.json();
+}
+
+export async function getStats(token: string): Promise<StatsResponse> {
+  const res = await authFetch("/api/rag/stats", {}, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to fetch stats");
+  }
+
+  return res.json();
+}
+
+export async function deleteDocument(filename: string, token: string): Promise<void> {
+  const res = await authFetch(
+    `/api/rag/documents/${encodeURIComponent(filename)}`,
+    { method: "DELETE" },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to delete document");
+  }
+}
+
+export async function clearKnowledgeBase(token: string): Promise<void> {
+  const res = await authFetch(
+    "/api/rag/clear",
+    { method: "DELETE" },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to clear knowledge base");
+  }
 }

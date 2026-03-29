@@ -3,6 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <img src="/logo.png" alt="Strategist" className="h-24 w-24 mb-6" />
       <h1 className="text-4xl font-bold text-gray-900 mb-4">
         Welcome to Strategist
       </h1>

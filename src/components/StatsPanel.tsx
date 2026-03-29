@@ -38,7 +38,7 @@ export default function StatsPanel({ stats, loading, onDelete, onClear }: StatsP
         )}
       </div>
       <p className="text-sm text-gray-600 mb-3">
-        {stats.chunk_count} chunks from {stats.documents.length} document{stats.documents.length !== 1 ? "s" : ""}
+        {stats.total_chunks} chunks from {stats.documents.length} document{stats.documents.length !== 1 ? "s" : ""}
       </p>
       {stats.documents.length > 0 ? (
         <ul className="space-y-2">

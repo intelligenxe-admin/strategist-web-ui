@@ -18,7 +18,7 @@ export interface QueryResponse {
 }
 
 export interface StatsResponse {
-  chunk_count: number;
+  total_chunks: number;
   documents: string[];
 }
 

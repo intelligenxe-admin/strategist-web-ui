@@ -3,18 +3,24 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { ApiOption, QueryResponse, StatsResponse } from "@/types";
+import { ApiOption, QueryResponse, StatsResponse, IngestUrlsResponse } from "@/types";
 import {
   uploadDocument,
   queryKnowledgeBase,
   getStats,
   deleteDocument,
   clearKnowledgeBase,
+  ingestUrls,
 } from "@/services/api";
 
 const EXTRACTION_OPTIONS: ApiOption[] = [
   { id: "llamaindex", label: "LlamaIndex" },
   { id: "advanced", label: "Advanced" },
+];
+
+const SOURCE_TYPE_OPTIONS: ApiOption[] = [
+  { id: "website", label: "Website" },
+  { id: "news", label: "News Article" },
 ];
 
 export function useStrategist() {
@@ -36,6 +42,13 @@ export function useStrategist() {
   // Stats state
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
+
+  // URL ingestion state
+  const [urls, setUrls] = useState<string[]>([""]);
+  const [sourceType, setSourceType] = useState("website");
+  const [ingesting, setIngesting] = useState(false);
+  const [ingestResult, setIngestResult] = useState<IngestUrlsResponse | null>(null);
+  const [ingestError, setIngestError] = useState<string | null>(null);
 
   // Query state
   const [question, setQuestion] = useState("");
@@ -102,6 +115,29 @@ export function useStrategist() {
     }
   }
 
+  async function handleIngestUrls() {
+    const validUrls = urls.map((u) => u.trim()).filter(Boolean);
+    if (validUrls.length === 0) {
+      setIngestError("Please enter at least one URL.");
+      return;
+    }
+    if (!user) return;
+
+    setIngesting(true);
+    setIngestError(null);
+    setIngestResult(null);
+    try {
+      const result = await ingestUrls(validUrls, sourceType, user.token);
+      setIngestResult(result);
+      setUrls([""]);
+      refreshStats();
+    } catch (err: unknown) {
+      setIngestError(err instanceof Error ? err.message : "URL ingestion failed");
+    } finally {
+      setIngesting(false);
+    }
+  }
+
   async function handleDeleteDocument(filename: string) {
     if (!user) return;
     try {
@@ -133,6 +169,16 @@ export function useStrategist() {
     uploadMessage,
     uploadError,
     handleUpload,
+    // URL Ingestion
+    urls,
+    setUrls,
+    sourceType,
+    setSourceType,
+    sourceTypeOptions: SOURCE_TYPE_OPTIONS,
+    ingesting,
+    ingestResult,
+    ingestError,
+    handleIngestUrls,
     // Stats
     stats,
     statsLoading,

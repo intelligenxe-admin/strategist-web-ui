@@ -1,4 +1,4 @@
-import { AuthUser, UploadResponse, QueryResponse, StatsResponse } from "@/types";
+import { AuthUser, UploadResponse, QueryResponse, StatsResponse, IngestUrlsResponse, DeleteDocumentResponse } from "@/types";
 
 async function authFetch(url: string, options: RequestInit, token: string): Promise<Response> {
   const res = await fetch(url, {
@@ -112,6 +112,11 @@ export async function getStats(token: string): Promise<StatsResponse> {
 }
 
 export async function deleteDocument(filename: string, token: string): Promise<void> {
+  if (filename.startsWith("http://") || filename.startsWith("https://")) {
+    await deleteDocumentByBody(filename, token);
+    return;
+  }
+
   const res = await authFetch(
     `/api/rag/documents/${encodeURIComponent(filename)}`,
     { method: "DELETE" },
@@ -122,6 +127,51 @@ export async function deleteDocument(filename: string, token: string): Promise<v
     const data = await res.json().catch(() => null);
     throw new Error(data?.error || "Failed to delete document");
   }
+}
+
+export async function deleteDocumentByBody(
+  filename: string,
+  token: string
+): Promise<DeleteDocumentResponse> {
+  const res = await authFetch(
+    "/api/rag/documents/delete",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename }),
+    },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to delete document");
+  }
+
+  return res.json();
+}
+
+export async function ingestUrls(
+  urls: string[],
+  sourceType: string,
+  token: string
+): Promise<IngestUrlsResponse> {
+  const res = await authFetch(
+    "/api/rag/ingest-urls",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ urls, source_type: sourceType }),
+    },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || data?.detail || data?.message || "URL ingestion failed");
+  }
+
+  return res.json();
 }
 
 export async function clearKnowledgeBase(token: string): Promise<void> {

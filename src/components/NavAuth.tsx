@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import NavLink from "./NavLink";
 
 export default function NavAuth() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -19,6 +20,7 @@ export default function NavAuth() {
 
   return (
     <div className="flex items-center gap-4">
+      <NavLink href="/workflows">Workflows</NavLink>
       <span className="text-sm text-gray-600">{user?.username}</span>
       <button
         type="button"

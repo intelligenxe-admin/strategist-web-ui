@@ -28,8 +28,8 @@ src/
 ### Key patterns
 
 - **Authentication**: `AuthContext` (`src/contexts/AuthContext.tsx`) provides `useAuth()` hook with `login`, `register`, `logout`, `user`, `isAuthenticated`. Token stored in `localStorage("auth")`. `Providers.tsx` wraps the app in `layout.tsx` to keep it a server component.
-- **Route protection**: `useStrategist` hook redirects unauthenticated users to `/login`. Login page redirects authenticated users to `/strategist`.
-- **State management**: The `useStrategist` hook (`src/hooks/useStrategist.ts`) centralizes all form state and API logic for the Strategist page (upload, URL ingestion, query, stats, document management). Components receive state via props — no global state manager.
+- **Route protection**: `useStrategist` and `useWorkflows` hooks redirect unauthenticated users to `/login`. Login page redirects authenticated users to `/strategist`.
+- **State management**: The `useStrategist` hook (`src/hooks/useStrategist.ts`) centralizes all form state and API logic for the Strategist page (upload, URL ingestion, query, stats, document management). The `useWorkflows` hook (`src/hooks/useWorkflows.ts`) does the same for the Workflows page (workflow selection, execution, run history). Components receive state via props — no global state manager.
 - **API layer**: `src/services/api.ts` uses `fetch` to call local proxy routes. Authenticated requests include `Authorization: Token <key>` header. A shared `authFetch()` helper handles 401 responses globally (clears token, redirects to `/login`).
 - **Client vs Server components**: Pages are server components by default. Components needing browser APIs, event handlers, or React state use `"use client"`. Navbar remains a server component with `NavAuth` as a client island.
 - **Headless UI**: Used only for the dropdown (`OptionDropdown` uses `Listbox`). All other inputs use standard HTML elements.
@@ -48,6 +48,11 @@ External APIs at `intelligenxe.org` don't support CORS, so all requests are prox
 - `src/app/api/rag/documents/[filename]/route.ts` → DELETE to `/api/rag/documents/<filename>/` (auth)
 - `src/app/api/rag/documents/delete/route.ts` → POST to `/api/rag/documents/delete/` (auth, JSON — body-based deletion for URL documents)
 - `src/app/api/rag/clear/route.ts` → DELETE to `/api/rag/clear/` (auth)
+- `src/app/api/workflows/route.ts` → GET to `/api/workflows/` (auth)
+- `src/app/api/workflows/tools/route.ts` → GET to `/api/workflows/tools/` (auth)
+- `src/app/api/workflows/run/route.ts` → POST to `/api/workflows/run/` (auth, JSON, long-running — maxDuration=600)
+- `src/app/api/workflows/runs/route.ts` → GET to `/api/workflows/runs/` (auth)
+- `src/app/api/workflows/runs/[id]/route.ts` → GET to `/api/workflows/runs/<id>/` (auth)
 
 ### API endpoints consumed
 
@@ -60,12 +65,18 @@ External APIs at `intelligenxe.org` don't support CORS, so all requests are prox
 - `DELETE /api/rag/documents/<filename>` — delete a specific document
 - `POST /api/rag/documents/delete` — delete a document by body payload (used for URL-sourced documents)
 - `DELETE /api/rag/clear` — wipe user's knowledge base
+- `GET /api/workflows` — list available workflows
+- `GET /api/workflows/tools` — list available tools
+- `POST /api/workflows/run` — execute a workflow (long-running, 2-5 min)
+- `GET /api/workflows/runs` — list user's past workflow runs (last 50)
+- `GET /api/workflows/runs/<id>` — get full run details
 
 ## Environment
 
 Copy `.env.local` and set:
 - `NEXT_PUBLIC_API_BASE_URL` — backend URL (defaults to `http://localhost:8000`)
 - `RAG_API_URL` — external RAG API base URL (server-only, defaults to `https://intelligenxe.org/api/rag`)
+- `WORKFLOWS_API_URL` — external Workflows API base URL (server-only, defaults to `https://intelligenxe.org/api/workflows`)
 
 ## Path alias
 

@@ -1,4 +1,4 @@
-import { AuthUser, UploadResponse, QueryResponse, StatsResponse, IngestUrlsResponse, DeleteDocumentResponse } from "@/types";
+import { AuthUser, UploadResponse, QueryResponse, StatsResponse, IngestUrlsResponse, DeleteDocumentResponse, Workflow, WorkflowRunSummary, WorkflowRunDetail } from "@/types";
 
 async function authFetch(url: string, options: RequestInit, token: string): Promise<Response> {
   const res = await fetch(url, {
@@ -185,4 +185,75 @@ export async function clearKnowledgeBase(token: string): Promise<void> {
     const data = await res.json().catch(() => null);
     throw new Error(data?.error || "Failed to clear knowledge base");
   }
+}
+
+// Workflow operations (all require token)
+
+export async function getWorkflows(token: string): Promise<{ workflows: Workflow[] }> {
+  const res = await authFetch("/api/workflows", {}, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to fetch workflows");
+  }
+
+  return res.json();
+}
+
+export async function getWorkflowTools(token: string): Promise<{ tools: string[] }> {
+  const res = await authFetch("/api/workflows/tools", {}, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to fetch tools");
+  }
+
+  return res.json();
+}
+
+export async function runWorkflow(
+  workflow: string,
+  inputs: Record<string, unknown>,
+  token: string,
+  signal?: AbortSignal
+): Promise<WorkflowRunDetail> {
+  const res = await authFetch(
+    "/api/workflows/run",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workflow, inputs }),
+      signal,
+    },
+    token
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Workflow execution failed");
+  }
+
+  return res.json();
+}
+
+export async function getWorkflowRuns(token: string): Promise<{ runs: WorkflowRunSummary[] }> {
+  const res = await authFetch("/api/workflows/runs", {}, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to fetch workflow runs");
+  }
+
+  return res.json();
+}
+
+export async function getWorkflowRunDetail(id: number, token: string): Promise<WorkflowRunDetail> {
+  const res = await authFetch(`/api/workflows/runs/${id}`, {}, token);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || "Failed to fetch run details");
+  }
+
+  return res.json();
 }

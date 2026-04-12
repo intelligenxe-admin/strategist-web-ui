@@ -46,3 +46,36 @@ export interface ApiOption {
   id: string;
   label: string;
 }
+
+// Workflows
+export interface Workflow {
+  name: string;
+  description: string;
+}
+
+export interface WorkflowRunSummary {
+  run_id: number;
+  workflow: string;
+  status: "pending" | "running" | "completed" | "failed";
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface WorkflowRunDetail extends WorkflowRunSummary {
+  inputs: Record<string, unknown>;
+  result: {
+    result: string;
+    workflow: string;
+    company: string;
+    ticker: string;
+    industry: string;
+  } | null;
+  error: string | null;
+}
+
+export interface CorporateStrategyInputs {
+  company_name: string;
+  ticker: string;
+  industry: string;
+  focus_areas?: string[];
+}

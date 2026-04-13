@@ -48,34 +48,42 @@ export interface ApiOption {
 }
 
 // Workflows
-export interface Workflow {
+export type WorkflowStatus = "running" | "completed" | "failed";
+
+export interface WorkflowSummary {
+  name: string;
+  description: string;
+  required_inputs: string[];
+  optional_inputs: string[];
+}
+
+export interface WorkflowTool {
   name: string;
   description: string;
 }
 
-export interface WorkflowRunSummary {
+export interface RunStart {
   run_id: number;
   workflow: string;
-  status: "pending" | "running" | "completed" | "failed";
+  status: "running";
+  created_at: string;
+}
+
+export interface RunSummary {
+  run_id: number;
+  workflow: string;
+  status: WorkflowStatus;
   created_at: string;
   completed_at: string | null;
 }
 
-export interface WorkflowRunDetail extends WorkflowRunSummary {
+export interface RunDetail {
+  run_id: number;
+  workflow: string;
+  status: WorkflowStatus;
   inputs: Record<string, unknown>;
-  result: {
-    result: string;
-    workflow: string;
-    company: string;
-    ticker: string;
-    industry: string;
-  } | null;
+  result: Record<string, unknown> | null;
   error: string | null;
-}
-
-export interface CorporateStrategyInputs {
-  company_name: string;
-  ticker: string;
-  industry: string;
-  focus_areas?: string[];
+  created_at: string;
+  completed_at: string | null;
 }

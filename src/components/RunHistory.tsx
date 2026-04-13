@@ -1,11 +1,11 @@
 "use client";
 
-import { WorkflowRunSummary } from "@/types";
+import Link from "next/link";
+import { RunSummary } from "@/types";
 
 interface RunHistoryProps {
-  runs: WorkflowRunSummary[];
+  runs: RunSummary[];
   loading: boolean;
-  onViewDetail: (id: number) => void;
   onRefresh: () => void;
 }
 
@@ -16,6 +16,10 @@ function formatDate(dateStr: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function prettyName(name: string): string {
+  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function statusColor(status: string): string {
@@ -31,16 +35,11 @@ function statusColor(status: string): string {
   }
 }
 
-export default function RunHistory({
-  runs,
-  loading,
-  onViewDetail,
-  onRefresh,
-}: RunHistoryProps) {
+export default function RunHistory({ runs, loading, onRefresh }: RunHistoryProps) {
   return (
     <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-gray-900">Run History</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Recent Runs</h2>
         <button
           type="button"
           onClick={onRefresh}
@@ -62,14 +61,13 @@ export default function RunHistory({
         <ul className="space-y-2 max-h-[500px] overflow-y-auto">
           {runs.map((run) => (
             <li key={run.run_id}>
-              <button
-                type="button"
-                onClick={() => onViewDetail(run.run_id)}
-                className="w-full text-left rounded bg-white px-3 py-2.5 border border-gray-100 hover:border-gray-300 transition-colors"
+              <Link
+                href={`/workflows/runs/${run.run_id}`}
+                className="block rounded bg-white px-3 py-2.5 border border-gray-100 hover:border-gray-300 transition-colors"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium text-gray-700 truncate">
-                    {run.workflow.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                    {prettyName(run.workflow)}
                   </span>
                   <span
                     className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColor(run.status)}`}
@@ -77,10 +75,8 @@ export default function RunHistory({
                     {run.status}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  {formatDate(run.created_at)}
-                </p>
-              </button>
+                <p className="text-xs text-gray-400 mt-1">{formatDate(run.created_at)}</p>
+              </Link>
             </li>
           ))}
         </ul>

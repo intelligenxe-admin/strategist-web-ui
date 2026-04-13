@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const WORKFLOWS_API_URL = process.env.WORKFLOWS_API_URL || "https://intelligenxe.org/api/workflows";
 
+export const maxDuration = 30;
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader) {
@@ -10,6 +12,7 @@ export async function GET(request: NextRequest) {
 
   const res = await fetch(`${WORKFLOWS_API_URL}/tools/`, {
     headers: { Authorization: authHeader },
+    cache: "no-store",
   });
 
   const data = await res.json().catch(() => null);

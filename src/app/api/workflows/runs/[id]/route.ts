@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const WORKFLOWS_API_URL = process.env.WORKFLOWS_API_URL || "https://intelligenxe.org/api/workflows";
 
+export const maxDuration = 30;
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -15,6 +17,7 @@ export async function GET(
 
   const res = await fetch(`${WORKFLOWS_API_URL}/runs/${id}/`, {
     headers: { Authorization: authHeader },
+    cache: "no-store",
   });
 
   const data = await res.json().catch(() => null);

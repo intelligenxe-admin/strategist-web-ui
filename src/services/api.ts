@@ -1,4 +1,4 @@
-import { AuthUser, UploadResponse, QueryResponse, StatsResponse, IngestUrlsResponse, DeleteDocumentResponse, Workflow, WorkflowRunSummary, WorkflowRunDetail } from "@/types";
+import { AuthUser, UploadResponse, QueryResponse, StatsResponse, IngestUrlsResponse, DeleteDocumentResponse, WorkflowSummary, WorkflowTool, RunStart, RunSummary, RunDetail } from "@/types";
 
 async function authFetch(url: string, options: RequestInit, token: string): Promise<Response> {
   const res = await fetch(url, {
@@ -187,9 +187,9 @@ export async function clearKnowledgeBase(token: string): Promise<void> {
   }
 }
 
-// Workflow operations (all require token)
+// Workflow operations (all require token; async contract)
 
-export async function getWorkflows(token: string): Promise<{ workflows: Workflow[] }> {
+export async function listWorkflows(token: string): Promise<{ workflows: WorkflowSummary[] }> {
   const res = await authFetch("/api/workflows", {}, token);
 
   if (!res.ok) {
@@ -200,7 +200,7 @@ export async function getWorkflows(token: string): Promise<{ workflows: Workflow
   return res.json();
 }
 
-export async function getWorkflowTools(token: string): Promise<{ tools: string[] }> {
+export async function listWorkflowTools(token: string): Promise<{ tools: WorkflowTool[] }> {
   const res = await authFetch("/api/workflows/tools", {}, token);
 
   if (!res.ok) {
@@ -211,32 +211,30 @@ export async function getWorkflowTools(token: string): Promise<{ tools: string[]
   return res.json();
 }
 
-export async function runWorkflow(
+export async function startRun(
   workflow: string,
   inputs: Record<string, unknown>,
-  token: string,
-  signal?: AbortSignal
-): Promise<WorkflowRunDetail> {
+  token: string
+): Promise<RunStart> {
   const res = await authFetch(
     "/api/workflows/run",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ workflow, inputs }),
-      signal,
     },
     token
   );
 
   if (!res.ok) {
     const data = await res.json().catch(() => null);
-    throw new Error(data?.error || "Workflow execution failed");
+    throw new Error(data?.error || "Failed to start workflow");
   }
 
   return res.json();
 }
 
-export async function getWorkflowRuns(token: string): Promise<{ runs: WorkflowRunSummary[] }> {
+export async function listRuns(token: string): Promise<{ runs: RunSummary[] }> {
   const res = await authFetch("/api/workflows/runs", {}, token);
 
   if (!res.ok) {
@@ -247,7 +245,7 @@ export async function getWorkflowRuns(token: string): Promise<{ runs: WorkflowRu
   return res.json();
 }
 
-export async function getWorkflowRunDetail(id: number, token: string): Promise<WorkflowRunDetail> {
+export async function getRunDetail(id: number, token: string): Promise<RunDetail> {
   const res = await authFetch(`/api/workflows/runs/${id}`, {}, token);
 
   if (!res.ok) {

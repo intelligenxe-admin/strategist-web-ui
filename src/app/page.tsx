@@ -1,23 +1,53 @@
-import Link from "next/link";
+"use client";
+
+import { useAuth } from "@/contexts/AuthContext";
+import { useWorkflowsList } from "@/hooks/useWorkflows";
+import WorkflowCard from "@/components/WorkflowCard";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  const { workflows, loading: workflowsLoading, error: workflowsError } = useWorkflowsList();
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <img src="/logo.png" alt="Strategist" className="h-24 w-24 mb-6" />
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        Welcome to Strategist
-      </h1>
-      <p className="text-lg text-gray-600 max-w-xl mb-8">
-        Upload documents, craft prompts, and get AI-powered strategic analysis.
-        Our tool helps you make informed decisions backed by intelligent
-        insights.
-      </p>
-      <Link
-        href="/strategist"
-        className="inline-flex items-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-      >
-        Get Started
-      </Link>
+    <div>
+      <div className="flex flex-col items-center justify-center text-center mb-12">
+        <img src="/logo.svg" alt="Strategist" className="h-36 w-36 mb-6" />
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Welcome to Strategist
+        </h1>
+        <p className="text-lg text-gray-600 max-w-xl">
+          Upload documents, craft prompts, and get AI-powered strategic analysis.
+          Our tool helps you make informed decisions backed by intelligent
+          insights.
+        </p>
+      </div>
+
+      {isAuthenticated && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">Available Workflows</h2>
+
+          {workflowsError && (
+            <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+              <p className="text-sm text-red-700">{workflowsError}</p>
+            </div>
+          )}
+
+          {workflowsLoading ? (
+            <div className="animate-pulse space-y-3">
+              <div className="h-32 bg-gray-200 rounded-lg" />
+              <div className="h-32 bg-gray-200 rounded-lg" />
+            </div>
+          ) : workflows.length === 0 ? (
+            <p className="text-sm text-gray-400">No workflows available.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {workflows.map((workflow) => (
+                <WorkflowCard key={workflow.name} workflow={workflow} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

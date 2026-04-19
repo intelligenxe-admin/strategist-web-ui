@@ -28,8 +28,8 @@ src/
 ### Key patterns
 
 - **Authentication**: `AuthContext` (`src/contexts/AuthContext.tsx`) provides `useAuth()` hook with `login`, `register`, `logout`, `user`, `isAuthenticated`. Token stored in `localStorage("auth")`. `Providers.tsx` wraps the app in `layout.tsx` to keep it a server component.
-- **Route protection**: `useStrategist` and `useWorkflows` hooks redirect unauthenticated users to `/login`. Login page redirects authenticated users to `/strategist`.
-- **State management**: The `useStrategist` hook (`src/hooks/useStrategist.ts`) centralizes all form state and API logic for the Strategist page (upload, URL ingestion, query, stats, document management). The `useWorkflows` hook (`src/hooks/useWorkflows.ts`) does the same for the Workflows page (workflow selection, execution, run history). Components receive state via props — no global state manager.
+- **Route protection**: `useRag` and `useWorkflows` hooks redirect unauthenticated users to `/login`. Login page redirects authenticated users to `/rag`.
+- **State management**: The `useRag` hook (`src/hooks/useRag.ts`) centralizes all form state and API logic for the RAG page (upload, URL ingestion, query, stats, document management). The `useWorkflows` hook (`src/hooks/useWorkflows.ts`) does the same for the Workflows page (workflow selection, execution, run history). Components receive state via props — no global state manager.
 - **API layer**: `src/services/api.ts` uses `fetch` to call local proxy routes. Authenticated requests include `Authorization: Token <key>` header. A shared `authFetch()` helper handles 401 responses globally (clears token, redirects to `/login`).
 - **Client vs Server components**: Pages are server components by default. Components needing browser APIs, event handlers, or React state use `"use client"`. Navbar remains a server component with `NavAuth` as a client island.
 - **Headless UI**: Used only for the dropdown (`OptionDropdown` uses `Listbox`). All other inputs use standard HTML elements.

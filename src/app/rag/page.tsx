@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useStrategist } from "@/hooks/useStrategist";
+import { useRag } from "@/hooks/useRag";
 import FileUpload from "@/components/FileUpload";
 import UrlIngestion from "@/components/UrlIngestion";
 import PromptInput from "@/components/PromptInput";
@@ -11,7 +11,7 @@ import SubmitButton from "@/components/SubmitButton";
 import ResponseDisplay from "@/components/ResponseDisplay";
 import StatsPanel from "@/components/StatsPanel";
 
-export default function StrategistPage() {
+export default function RagPage() {
   const {
     file,
     setFile,
@@ -43,13 +43,13 @@ export default function StrategistPage() {
     querying,
     queryError,
     handleQuery,
-  } = useStrategist();
+  } = useRag();
 
   const [dataSource, setDataSource] = useState<"upload" | "urls">("upload");
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Strategist</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">RAG</h1>
 
       {/* Document Management */}
       <section className="mb-8">

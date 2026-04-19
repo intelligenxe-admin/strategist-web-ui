@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) router.push("/strategist");
+    if (isAuthenticated) router.push("/rag");
   }, [isAuthenticated, router]);
 
   async function handleSubmit(e: FormEvent) {
@@ -31,7 +31,7 @@ export default function LoginPage() {
       } else {
         await register(username, password, email);
       }
-      router.push("/strategist");
+      router.push("/rag");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

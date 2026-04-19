@@ -85,7 +85,7 @@ export default function RunDetailPage({
     setDeleting(true);
     try {
       await deleteRun(runId, user.token);
-      router.push("/workflows");
+      router.push("/");
     } catch (err: unknown) {
       setDeleteError(err instanceof Error ? err.message : "Failed to delete run");
       setDeleting(false);
@@ -96,10 +96,10 @@ export default function RunDetailPage({
     <div>
       <div className="flex items-center justify-between mb-4">
         <Link
-          href="/workflows"
+          href="/"
           className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
-          ← Back to workflows
+          ← Back to home
         </Link>
         {Number.isFinite(runId) && (
           <button

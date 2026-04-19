@@ -23,7 +23,7 @@ const SOURCE_TYPE_OPTIONS: ApiOption[] = [
   { id: "news", label: "News Article" },
 ];
 
-export function useStrategist() {
+export function useRag() {
   const { user } = useAuth();
   const router = useRouter();
 

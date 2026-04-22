@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Switch } from "@headlessui/react";
 import { useAuth } from "@/contexts/AuthContext";
 import { WorkflowSummary } from "@/types";
 import { startRun } from "@/services/api";
@@ -20,16 +22,48 @@ interface WorkflowFormProps {
   workflow: WorkflowSummary;
 }
 
+interface StoredFormState {
+  inputs: Record<string, string>;
+  useRag: boolean;
+}
+
 function humanize(key: string): string {
   return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function storageKey(name: string): string {
+  return `workflow-form:${name}`;
+}
+
+function loadStoredState(name: string): StoredFormState {
+  if (typeof window === "undefined") return { inputs: {}, useRag: false };
+  try {
+    const raw = window.sessionStorage.getItem(storageKey(name));
+    if (!raw) return { inputs: {}, useRag: false };
+    const parsed = JSON.parse(raw) as Partial<StoredFormState>;
+    return {
+      inputs: parsed.inputs ?? {},
+      useRag: Boolean(parsed.useRag),
+    };
+  } catch {
+    return { inputs: {}, useRag: false };
+  }
 }
 
 export default function WorkflowForm({ workflow }: WorkflowFormProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [inputs, setInputs] = useState<Record<string, string>>({});
+  const initial = loadStoredState(workflow.name);
+  const [inputs, setInputs] = useState<Record<string, string>>(initial.inputs);
+  const [useRag, setUseRag] = useState<boolean>(initial.useRag);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const payload: StoredFormState = { inputs, useRag };
+    window.sessionStorage.setItem(storageKey(workflow.name), JSON.stringify(payload));
+  }, [inputs, useRag, workflow.name]);
 
   function handleInputChange(key: string, value: string) {
     setInputs((prev) => ({ ...prev, [key]: value }));
@@ -40,6 +74,8 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
     workflow.required_inputs?.length ? workflow.required_inputs : fallback?.required ?? [];
   const optionalInputs =
     workflow.optional_inputs?.length ? workflow.optional_inputs : fallback?.optional ?? [];
+
+  const isCorporateStrategy = workflow.name === "corporate_strategy";
 
   async function handleSubmit() {
     if (!user) return;
@@ -63,10 +99,17 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
       }
     }
 
+    if (isCorporateStrategy) {
+      processed.use_rag = useRag;
+    }
+
     setSubmitting(true);
     setError(null);
     try {
       const result = await startRun(workflow.name, processed, user.token);
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(storageKey(workflow.name));
+      }
       router.push(`/workflows/runs/${result.run_id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to start workflow");
@@ -107,6 +150,43 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
     <div className="space-y-4">
       {requiredInputs.map((key) => renderField(key, true))}
       {optionalInputs.map((key) => renderField(key, false))}
+
+      {isCorporateStrategy && (
+        <div className="flex items-center gap-3 pt-1">
+          <Switch
+            checked={useRag}
+            onChange={setUseRag}
+            aria-label="Use my knowledge base"
+            className={`${
+              useRag ? "bg-blue-600" : "bg-gray-300"
+            } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+          >
+            <span
+              aria-hidden="true"
+              className={`${
+                useRag ? "translate-x-5" : "translate-x-0"
+              } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform`}
+            />
+          </Switch>
+          {useRag ? (
+            <Link
+              href="/rag"
+              className="inline-flex items-center justify-center rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              Tailored Strategy (optional)
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="inline-flex items-center justify-center rounded-lg bg-gray-300 px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed"
+            >
+              Tailored Strategy (optional)
+            </button>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg bg-red-50 p-3 border border-red-200">

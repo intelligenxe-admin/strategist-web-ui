@@ -16,7 +16,13 @@ const WORKFLOW_SCHEMAS: Record<string, { required: string[]; optional: string[] 
     required: ["company_name", "ticker", "industry"],
     optional: ["focus_areas"],
   },
+  five_forces: {
+    required: ["company_name", "ticker", "industry"],
+    optional: ["focus_areas"],
+  },
 };
+
+const RAG_ENABLED_WORKFLOWS = new Set(["corporate_strategy", "five_forces"]);
 
 interface WorkflowFormProps {
   workflow: WorkflowSummary;
@@ -75,7 +81,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
   const optionalInputs =
     workflow.optional_inputs?.length ? workflow.optional_inputs : fallback?.optional ?? [];
 
-  const isCorporateStrategy = workflow.name === "corporate_strategy";
+  const supportsRag = RAG_ENABLED_WORKFLOWS.has(workflow.name);
 
   async function handleSubmit() {
     if (!user) return;
@@ -99,7 +105,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
       }
     }
 
-    if (isCorporateStrategy) {
+    if (supportsRag) {
       processed.use_rag = useRag;
     }
 
@@ -151,7 +157,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
       {requiredInputs.map((key) => renderField(key, true))}
       {optionalInputs.map((key) => renderField(key, false))}
 
-      {isCorporateStrategy && (
+      {supportsRag && (
         <div className="flex items-center gap-3 pt-1">
           <Switch
             checked={useRag}
@@ -170,7 +176,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
           </Switch>
           {useRag ? (
             <Link
-              href="/rag"
+              href={`/rag?return=${workflow.name}`}
               className="inline-flex items-center justify-center rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Tailored Strategy (optional)

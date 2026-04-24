@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useRag } from "@/hooks/useRag";
 import FileUpload from "@/components/FileUpload";
 import UrlIngestion from "@/components/UrlIngestion";
@@ -48,10 +49,14 @@ export default function RagPage() {
 
   const [dataSource, setDataSource] = useState<"upload" | "urls">("upload");
 
+  const searchParams = useSearchParams();
+  const returnWorkflow = searchParams.get("return") ?? "corporate_strategy";
+  const backHref = `/workflows/${returnWorkflow}`;
+
   return (
     <div>
       <Link
-        href="/workflows/corporate_strategy"
+        href={backHref}
         className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors mb-4"
       >
         ← Back to Strategist
@@ -170,7 +175,7 @@ export default function RagPage() {
 
       <div className="mt-8">
         <Link
-          href="/workflows/corporate_strategy"
+          href={backHref}
           className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
           ← Back to Strategist

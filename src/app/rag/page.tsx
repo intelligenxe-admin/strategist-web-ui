@@ -62,7 +62,23 @@ export default function RagPage() {
         ← Back to Strategist
       </Link>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">RAG</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Knowledge</h1>
+
+      <div className="mb-8 text-sm text-gray-700">
+        <p className="mb-2">
+          Upload documents and/or ingest websites containing:
+        </p>
+        <ol className="list-decimal list-inside space-y-1 pl-2">
+          <li>
+            Company or industry facts to emphasize when designing the corporate
+            strategy
+          </li>
+          <li>
+            Special management techniques to apply when designing the corporate
+            strategy (in addition to the framework&rsquo;s approach)
+          </li>
+        </ol>
+      </div>
 
       {/* Document Management */}
       <section className="mb-8 rounded-lg bg-gray-50 p-6 border border-gray-200">
@@ -153,7 +169,7 @@ export default function RagPage() {
 
       {/* Query */}
       <section className="rounded-lg bg-gray-50 p-6 border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Query Knowledge Base</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Query Knowledge Base (optional test)</h2>
         <div className="space-y-4">
           <PromptInput
             value={question}

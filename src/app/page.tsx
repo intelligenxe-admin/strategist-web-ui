@@ -16,7 +16,7 @@ export default function Home() {
           Welcome to Strategist
         </h1>
         <p className="text-lg text-gray-600 max-w-xl">
-          Produce corporate strategy reports for your preferred publicly traded companies worldwide using the AI-powered frameworks below:
+          Perform corporate strategy analyses on publicly traded companies worldwide using the AI-powered frameworks
         </p>
       </div>
 

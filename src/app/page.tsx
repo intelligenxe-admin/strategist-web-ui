@@ -16,15 +16,13 @@ export default function Home() {
           Welcome to Strategist
         </h1>
         <p className="text-lg text-gray-600 max-w-xl">
-          Upload documents, craft prompts, and get AI-powered strategic analysis.
-          Our tool helps you make informed decisions backed by intelligent
-          insights.
+          Produce corporate strategy reports for your preferred publicly traded companies worldwide using the AI-powered frameworks below:
         </p>
       </div>
 
       {isAuthenticated && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Available Workflows</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Available AI-Powered Corporate Strategy Frameworks</h2>
 
           {workflowsError && (
             <div className="rounded-lg bg-red-50 p-3 border border-red-200">

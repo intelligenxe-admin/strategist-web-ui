@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NavLink from "./NavLink";
 import NavAuth from "./NavAuth";
+import NavWorkflowLinks from "./NavWorkflowLinks";
 
 export default function Navbar() {
   return (
@@ -11,6 +12,7 @@ export default function Navbar() {
       </Link>
       <div className="flex items-center gap-6">
         <NavLink href="/">Home</NavLink>
+        <NavWorkflowLinks />
         <NavLink href="/rag">RAG</NavLink>
         <NavLink href="/about">About</NavLink>
         <NavAuth />

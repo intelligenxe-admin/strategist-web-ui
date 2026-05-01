@@ -40,7 +40,7 @@ export default function About() {
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
         >
-          {" "}INTELLIGENXE's Terms & Conditions | User Agreement{" "}
+          {" "}INTELLIGENXE's Terms of Use | User Agreement{" "}
         </a>
         .
       </p>

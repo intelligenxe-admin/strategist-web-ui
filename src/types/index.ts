@@ -78,12 +78,23 @@ export interface RunSummary {
   completed_at: string | null;
 }
 
+export interface WorkflowRunResult {
+  result?: string;
+  workflow?: string;
+  company?: string;
+  ticker?: string;
+  industry?: string;
+  use_rag?: boolean;
+  references?: string[];
+  [key: string]: unknown;
+}
+
 export interface RunDetail {
   run_id: number;
   workflow: string;
   status: WorkflowStatus;
   inputs: Record<string, unknown>;
-  result: Record<string, unknown> | null;
+  result: WorkflowRunResult | null;
   error: string | null;
   created_at: string;
   completed_at: string | null;

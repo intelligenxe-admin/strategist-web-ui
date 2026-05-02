@@ -29,6 +29,25 @@ function getMarkdownResult(result: Record<string, unknown> | null): string | nul
   return null;
 }
 
+function getReferences(result: Record<string, unknown> | null): string[] | null {
+  if (!result) return null;
+  const refs = result.references;
+  if (!Array.isArray(refs) || refs.length === 0) return null;
+  const filtered = refs.filter((r): r is string => typeof r === "string" && r.length > 0);
+  return filtered.length > 0 ? filtered : null;
+}
+
+function stripTrailingReferences(md: string): string {
+  const re = /(?:^|\n)##\s+references\s*\r?\n/gi;
+  let cutAt = -1;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(md)) !== null) {
+    cutAt = match[0].startsWith("\n") ? match.index + 1 : match.index;
+  }
+  if (cutAt === -1) return md;
+  return md.slice(0, cutAt).trimEnd();
+}
+
 export default function RunDetailPage({
   params,
 }: {
@@ -67,7 +86,10 @@ export default function RunDetailPage({
     return Math.max(0, end - start);
   }, [data, now]);
 
-  const markdownResult = getMarkdownResult(data?.result ?? null);
+  const rawMarkdownResult = getMarkdownResult(data?.result ?? null);
+  const references = getReferences(data?.result ?? null);
+  const markdownResult =
+    rawMarkdownResult && references ? stripTrailingReferences(rawMarkdownResult) : rawMarkdownResult;
 
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -213,6 +235,25 @@ export default function RunDetailPage({
               {markdownResult ? (
                 <div className="max-h-[600px] overflow-y-auto">
                   <MarkdownContent content={markdownResult} />
+                  {references && (
+                    <div className="text-sm text-gray-700 leading-relaxed">
+                      <h2 className="text-xl font-semibold text-gray-900 mt-5 mb-2">References</h2>
+                      <ul className="list-disc pl-5 mb-3">
+                        {references.map((url) => (
+                          <li key={url} className="mb-1 break-all">
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-brand underline"
+                            >
+                              {url}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <pre className="text-sm font-mono text-gray-100 bg-gray-900 p-4 rounded-lg overflow-x-auto max-h-[600px] leading-relaxed">

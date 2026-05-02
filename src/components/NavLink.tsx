@@ -15,10 +15,10 @@ export default function NavLink({ href, children }: NavLinkProps) {
   return (
     <Link
       href={href}
-      className={`text-sm font-bold transition-colors ${
+      className={`relative text-sm font-medium transition-colors ${
         isActive
-          ? "text-blue-600"
-          : "text-[#020266] hover:text-[#020266]/80"
+          ? "text-brand after:absolute after:left-0 after:right-0 after:-bottom-[18px] after:h-[2px] after:bg-brand"
+          : "text-gray-700 hover:text-brand"
       }`}
     >
       {children}

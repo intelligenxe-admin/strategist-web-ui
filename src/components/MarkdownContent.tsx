@@ -20,7 +20,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
         [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-3
         [&_li]:mb-1
         [&_strong]:font-semibold [&_strong]:text-gray-900
-        [&_a]:text-blue-600 [&_a]:underline
+        [&_a]:text-brand [&_a]:underline
         [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:my-3
         [&_code]:bg-gray-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono
         [&_pre]:bg-gray-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0

@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { WorkflowSummary } from "@/types";
 import { startRun } from "@/services/api";
 import SubmitButton from "./SubmitButton";
+import Alert from "./Alert";
 
 const ARRAY_FIELDS = new Set(["focus_areas"]);
 
@@ -164,7 +165,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
             onChange={setUseRag}
             aria-label="Use my knowledge base"
             className={`${
-              useRag ? "bg-blue-600" : "bg-gray-300"
+              useRag ? "bg-brand" : "bg-gray-300"
             } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
           >
             <span
@@ -194,11 +195,7 @@ export default function WorkflowForm({ workflow }: WorkflowFormProps) {
         </div>
       )}
 
-      {error && (
-        <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
+      {error && <Alert variant="error">{error}</Alert>}
 
       <div className="pt-2">
         <SubmitButton

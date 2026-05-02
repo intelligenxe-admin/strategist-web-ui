@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { History } from "lucide-react";
 import { RunSummary } from "@/types";
 import { workflowDisplayName } from "@/lib/workflows";
+import Alert from "./Alert";
+import EmptyState from "./EmptyState";
 
 interface RunHistoryProps {
   runs: RunSummary[];
@@ -56,23 +59,19 @@ export default function RunHistory({ runs, loading, onRefresh, onDelete, deleteE
   };
 
   return (
-    <div className="rounded-lg bg-gray-50 p-4 border border-gray-200">
+    <div className="rounded-lg bg-white p-4 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold text-gray-900">Recent Runs</h2>
         <button
           type="button"
           onClick={onRefresh}
-          className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="text-xs font-medium text-brand hover:text-brand-hover transition-colors"
         >
           Refresh
         </button>
       </div>
 
-      {deleteError && (
-        <div className="rounded-lg bg-red-50 p-3 border border-red-200 mb-3">
-          <p className="text-sm text-red-700">{deleteError}</p>
-        </div>
-      )}
+      {deleteError && <Alert variant="error" className="mb-3">{deleteError}</Alert>}
 
       {loading ? (
         <div className="animate-pulse space-y-3">
@@ -81,7 +80,11 @@ export default function RunHistory({ runs, loading, onRefresh, onDelete, deleteE
           <div className="h-12 bg-gray-200 rounded" />
         </div>
       ) : runs.length === 0 ? (
-        <p className="text-sm text-gray-400">No workflow runs yet.</p>
+        <EmptyState
+          icon={History}
+          title="No runs yet"
+          description="Submit the form to start your first run."
+        />
       ) : (
         <ul className="space-y-2 max-h-[500px] overflow-y-auto">
           {runs.map((run) => (

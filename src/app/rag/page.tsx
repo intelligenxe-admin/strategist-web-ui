@@ -12,6 +12,7 @@ import ParameterInput from "@/components/ParameterInput";
 import SubmitButton from "@/components/SubmitButton";
 import ResponseDisplay from "@/components/ResponseDisplay";
 import StatsPanel from "@/components/StatsPanel";
+import Alert from "@/components/Alert";
 
 export default function RagPage() {
   const {
@@ -62,9 +63,9 @@ export default function RagPage() {
         ← Back to Strategist
       </Link>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Knowledge</h1>
+      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900 mb-6">Knowledge</h1>
 
-      <div className="mb-8 text-sm text-gray-700">
+      <div className="mb-8 text-base text-gray-700 leading-relaxed">
         <p className="mb-2">
           Upload documents and/or ingest websites containing:
         </p>
@@ -81,18 +82,18 @@ export default function RagPage() {
       </div>
 
       {/* Document Management */}
-      <section className="mb-8 rounded-lg bg-gray-50 p-6 border border-gray-200">
+      <section className="mb-8 rounded-lg bg-white p-6 border border-gray-200 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Add Knowledge</h2>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 mb-4">
+        <div className="inline-flex rounded-lg bg-gray-100 p-1 mb-4">
           <button
             type="button"
             onClick={() => setDataSource("upload")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               dataSource === "upload"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             Upload File
@@ -100,10 +101,10 @@ export default function RagPage() {
           <button
             type="button"
             onClick={() => setDataSource("urls")}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               dataSource === "urls"
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             Ingest URLs
@@ -131,16 +132,8 @@ export default function RagPage() {
                 loadingLabel="Uploading..."
               />
             </div>
-            {uploadMessage && (
-              <div className="rounded-lg bg-green-50 p-3 border border-green-200">
-                <p className="text-sm text-green-700">{uploadMessage}</p>
-              </div>
-            )}
-            {uploadError && (
-              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-                <p className="text-sm text-red-700">{uploadError}</p>
-              </div>
-            )}
+            {uploadMessage && <Alert variant="success">{uploadMessage}</Alert>}
+            {uploadError && <Alert variant="error">{uploadError}</Alert>}
           </div>
         ) : (
           <UrlIngestion
@@ -168,7 +161,7 @@ export default function RagPage() {
       </section>
 
       {/* Query */}
-      <section className="rounded-lg bg-gray-50 p-6 border border-gray-200">
+      <section className="rounded-lg bg-white p-6 border border-gray-200 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Query Knowledge Base (optional test)</h2>
         <div className="space-y-4">
           <PromptInput

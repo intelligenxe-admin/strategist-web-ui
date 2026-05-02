@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { FileText, UploadCloud } from "lucide-react";
 
 interface FileUploadProps {
   file: File | null;
@@ -66,6 +67,7 @@ export default function FileUpload({ file, onFileChange }: FileUploadProps) {
         />
         {file ? (
           <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5 text-gray-500 shrink-0" />
             <span className="text-sm text-gray-700">{file.name}</span>
             <button
               type="button"
@@ -79,7 +81,8 @@ export default function FileUpload({ file, onFileChange }: FileUploadProps) {
             </button>
           </div>
         ) : (
-          <div className="text-center">
+          <div className="flex flex-col items-center text-center">
+            <UploadCloud className="h-8 w-8 text-gray-400 mb-2" />
             <p className="text-sm text-gray-600">
               Drag and drop a PDF here, or click to browse
             </p>

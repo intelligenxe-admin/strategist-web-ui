@@ -1,4 +1,5 @@
 import { QueryResponse } from "@/types";
+import Alert from "./Alert";
 
 interface ResponseDisplayProps {
   response: QueryResponse | null;
@@ -24,11 +25,7 @@ export default function ResponseDisplay({
   }
 
   if (error) {
-    return (
-      <div className="mt-6 rounded-lg bg-red-50 p-3 border border-red-200">
-        <p className="text-sm text-red-700">{error}</p>
-      </div>
-    );
+    return <Alert variant="error" className="mt-6">{error}</Alert>;
   }
 
   if (!response) return null;

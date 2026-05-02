@@ -3,10 +3,12 @@
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRunStatus } from "@/hooks/useWorkflows";
 import { deleteRun } from "@/services/api";
 import MarkdownContent from "@/components/MarkdownContent";
+import Alert from "@/components/Alert";
 import { workflowDisplayName } from "@/lib/workflows";
 
 function prettyName(name: string): string {
@@ -114,20 +116,12 @@ export default function RunDetailPage({
         )}
       </div>
 
-      {deleteError && (
-        <div className="rounded-lg bg-red-50 p-3 border border-red-200 mb-4">
-          <p className="text-sm text-red-700">{deleteError}</p>
-        </div>
-      )}
+      {deleteError && <Alert variant="error" className="mb-4">{deleteError}</Alert>}
 
       {!Number.isFinite(runId) ? (
-        <div className="rounded-lg bg-red-50 p-4 border border-red-200">
-          <p className="text-sm text-red-700">Invalid run id.</p>
-        </div>
+        <Alert variant="error">Invalid run id.</Alert>
       ) : error && !data ? (
-        <div className="rounded-lg bg-red-50 p-4 border border-red-200">
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
+        <Alert variant="error">{error}</Alert>
       ) : !data ? (
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-1/2" />
@@ -137,7 +131,7 @@ export default function RunDetailPage({
       ) : (
         <>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">
               {workflowDisplayName(data.workflow)}
             </h1>
             <span
@@ -160,25 +154,7 @@ export default function RunDetailPage({
           {data.status === "running" && (
             <div className="rounded-lg bg-yellow-50 p-6 border border-yellow-200 mb-6">
               <div className="flex items-center gap-3">
-                <svg
-                  className="h-5 w-5 animate-spin text-yellow-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
+                <Loader2 className="h-5 w-5 animate-spin text-yellow-600" />
                 <div>
                   <p className="text-sm font-medium text-yellow-800">
                     Running for {formatElapsed(elapsedMs)}…
@@ -223,13 +199,13 @@ export default function RunDetailPage({
 
           {/* Completed result */}
           {data.status === "completed" && data.result && (
-            <div className="rounded-lg bg-gray-50 p-6 border border-gray-200">
+            <div className="rounded-lg bg-white p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">Result</h2>
                 <button
                   type="button"
                   onClick={copyResultJson}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  className="text-xs font-medium text-brand hover:text-brand-hover transition-colors"
                 >
                   Copy result JSON
                 </button>
@@ -239,7 +215,7 @@ export default function RunDetailPage({
                   <MarkdownContent content={markdownResult} />
                 </div>
               ) : (
-                <pre className="text-xs text-gray-800 bg-white p-4 rounded border border-gray-100 overflow-x-auto max-h-[600px]">
+                <pre className="text-sm font-mono text-gray-100 bg-gray-900 p-4 rounded-lg overflow-x-auto max-h-[600px] leading-relaxed">
                   {JSON.stringify(data.result, null, 2)}
                 </pre>
               )}
@@ -248,9 +224,7 @@ export default function RunDetailPage({
 
           {/* Polling error after data exists */}
           {error && data && (
-            <div className="rounded-lg bg-yellow-50 p-3 border border-yellow-200 mt-4">
-              <p className="text-xs text-yellow-700">Polling issue: {error}</p>
-            </div>
+            <Alert variant="warning" className="mt-4">Polling issue: {error}</Alert>
           )}
         </>
       )}

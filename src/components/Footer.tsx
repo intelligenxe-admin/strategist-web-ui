@@ -12,11 +12,11 @@ export default function Footer() {
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Product</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Platform</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/" className="text-gray-600 hover:text-brand transition-colors">
-                  Home
+                  Workflows
                 </Link>
               </li>
               <li>

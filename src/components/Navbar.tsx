@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import NavLink from "./NavLink";
 import NavAuth from "./NavAuth";
@@ -8,7 +9,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-40 flex h-14 items-center justify-between px-6 bg-white/80 backdrop-blur border-b border-gray-200/80">
       <div className="flex items-center gap-2">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="" className="h-8 w-8" />
+          <Image src="/logo.svg" alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-semibold text-lg text-gray-900">Strategist</span>
         </Link>
         <a
@@ -16,9 +17,11 @@ export default function Navbar() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img
+          <Image
             src="/intelligenxe-wordmark.jpg"
             alt="Intelligenxe"
+            width={400}
+            height={35}
             className="h-8 w-auto"
           />
         </a>

@@ -32,8 +32,25 @@ src/
 - **State management**: The `useRag` hook (`src/hooks/useRag.ts`) centralizes all form state and API logic for the RAG page (upload, URL ingestion, query, stats, document management). The `useWorkflows` hook (`src/hooks/useWorkflows.ts`) does the same for the Workflows page (workflow selection, execution, run history). Components receive state via props — no global state manager.
 - **API layer**: `src/services/api.ts` uses `fetch` to call local proxy routes. Authenticated requests include `Authorization: Token <key>` header. A shared `authFetch()` helper handles 401 responses globally (clears token, redirects to `/login`).
 - **Client vs Server components**: Pages are server components by default. Components needing browser APIs, event handlers, or React state use `"use client"`. Navbar remains a server component with `NavAuth` as a client island.
-- **Headless UI**: Used only for the dropdown (`OptionDropdown` uses `Listbox`). All other inputs use standard HTML elements.
-- **Styling**: Tailwind utility classes directly in JSX. Custom theme variables defined in `src/app/globals.css`. Fonts: Geist Sans/Mono.
+- **Headless UI**: Used only for the dropdown (`OptionDropdown` uses `Listbox`) and the RAG toggle (`Switch` in `WorkflowForm`). All other inputs use standard HTML elements.
+- **Styling**: Tailwind utility classes directly in JSX, with a small set of custom design tokens defined in `src/app/globals.css`:
+  - Brand colors: `--brand` (#020266), `--brand-hover` (#03038a), exposed via `@theme inline` as `bg-brand`, `text-brand`, `border-brand`, `ring-brand`. Use these for primary actions, active states, and links — not raw `blue-600`.
+  - Fonts: Geist Sans/Mono via `next/font` in `layout.tsx`. The body font is set in `globals.css` as `var(--font-sans), Arial, ...` — don't override on `body`.
+  - Dark mode is intentionally NOT implemented. Don't add `dark:` variants or `prefers-color-scheme` rules without a full audit pass.
+- **Icons**: `lucide-react` is the standard. Do not hand-roll inline SVGs — import from `lucide-react` (e.g. `Loader2`, `Check`, `X`, `ChevronDown`, `AlertCircle`).
+- **Shared UI components** (reuse before adding new variants):
+  - `Button` (`src/components/Button.tsx`) — variants: `primary` | `secondary` | `ghost` | `destructive`, sizes `sm` | `md`. Use this instead of writing button class strings inline.
+  - `Alert` (`src/components/Alert.tsx`) — variants: `error` | `success` | `warning` | `info`. Use for any colored notification box.
+  - `EmptyState` (`src/components/EmptyState.tsx`) — dashed-border placeholder with icon chip + title + optional description and action. Use for empty lists, not "no items" plain text.
+  - `SubmitButton` (`src/components/SubmitButton.tsx`) — wraps `Button` with a `Loader2` spinner; use for async form submissions.
+
+### Visual conventions
+
+- **Headings**: H1s use `text-3xl md:text-4xl font-semibold tracking-tight text-gray-900`. Use `font-semibold` (not `font-bold`) and `tracking-tight` for any H1.
+- **Body text**: `text-base text-gray-700 leading-relaxed` is the default. Reserve `text-sm` for metadata, captions, helper text, and table cells.
+- **Surfaces**: cards/panels that represent a primary surface use `bg-white shadow-sm border border-gray-200 rounded-lg`. Recessed inline boxes (metadata, code) stay flat (`bg-gray-50` or `bg-gray-100`).
+- **Tabs**: pill-on-gray pattern (`bg-gray-100 p-1` track, active pill is `bg-white shadow-sm`) — see `app/login/page.tsx` and `app/rag/page.tsx`.
+- **Images**: use `next/image` (`<Image>`), not raw `<img>`. The hero logo uses `priority`.
 
 ### API proxy routes
 

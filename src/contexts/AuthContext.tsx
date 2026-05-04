@@ -15,18 +15,21 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = window.localStorage.getItem("auth");
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as AuthUser;
+    } catch {
+      window.localStorage.removeItem("auth");
+      return null;
+    }
+  });
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("auth");
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem("auth");
-      }
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot client-detect to suppress SSR/CSR mismatch
     setHydrated(true);
   }, []);
 

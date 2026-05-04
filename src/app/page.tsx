@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkflowsList } from "@/hooks/useWorkflows";
@@ -22,7 +23,14 @@ export default function Home() {
     <div>
       <div className="rounded-2xl bg-gradient-to-b from-slate-50 to-white border border-gray-200 px-6 py-12 sm:py-16 mb-12">
         <div className="flex flex-col items-center justify-center text-center">
-          <img src="/logo.svg" alt="Strategist" className="h-32 w-32 sm:h-36 sm:w-36 mb-6" />
+          <Image
+            src="/logo.svg"
+            alt="Strategist"
+            width={144}
+            height={144}
+            priority
+            className="h-32 w-32 sm:h-36 sm:w-36 mb-6"
+          />
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4">
             Welcome to Strategist
           </h1>

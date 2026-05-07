@@ -38,12 +38,20 @@ export async function loginUser(username: string, password: string): Promise<Aut
 export async function registerUser(
   username: string,
   password: string,
-  email: string
+  email: string,
+  firstName: string,
+  lastName: string
 ): Promise<AuthUser> {
   const res = await fetch("/api/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password, email }),
+    body: JSON.stringify({
+      username,
+      password,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+    }),
   });
 
   if (!res.ok) {
